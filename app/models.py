@@ -49,11 +49,12 @@ class User(db.Model):
 	
 class Tag(db.Model):
 	__tablename__ = 'tags'
-	id
-	name
-	description
-	matter
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(128))
+	description = db.Column(db.String(256))
+	matter_id = db.Column(db.Integer, db.ForeignKey('matters.id'))
 	documents
+	isParent
 	
 class Message(db.Model):
 	__tablename__ = 'messages'
@@ -90,7 +91,7 @@ class Matter(db.Model):
 	users = db.relationship('User', seconary = userMatters, backref=db.backref('matters', lazy='dynamic'), lazy='dynamic')
 	queries
 	messages
-	tags
+	tags = db.relationship('Tag', backref='matter', lazy='dynamic')
 
 class Metadatum(db.Model):
 	__tablename__ = 'metadata'
