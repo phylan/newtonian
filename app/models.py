@@ -40,7 +40,7 @@ class User(db.Model):
 	name = db.Column(db.String(128))
 	password_hash = db.Column(db.String(128))
 	handle = db.Column(db.String(64), unique=True)
-	firm = db.Column(db.String(128), default="Conrad O'Brien, P.C.")
+	firm = db.Column(db.String(128), default=HOME_FIRM)
 	email = db.Column(db.String(64))
 	permission = db.Column(db.Integer)
 	inMessages = db.relationship('Message', secondary = userMessages, backref=db.backref('users', lazy='dynamic'), lazy='dynamic')
