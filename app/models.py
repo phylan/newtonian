@@ -46,7 +46,12 @@ class Message(db.Model):
 	content
 	timestamp
 	
-
+class Query(db.Model):
+	__tablename__ = 'queries'
+	id
+	matter
+	documents
+	
 
 
 	
