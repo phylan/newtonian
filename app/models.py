@@ -72,6 +72,7 @@ class Query(db.Model):
 	name
 	matter
 	documents
+	author 
 	
 class Client(db.Model):
 	__tablename__ = 'clients'
