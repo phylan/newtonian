@@ -1,0 +1,12 @@
+import os
+
+SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+
+NEWTONIAN_MAIL_SERVER = os.environ.get("NEWTONIAN_MAIL_SERVER")
+NEWTONIAN_MAIL_ADMIN_NAME = os.environ.get("NEWTONIAN_MAIL_ADMIN_NAME")
+
+S3_BUCKET = os.environ.get("S3_BUCKET")
+S3_ACCESS_KEY_ID = os.environ.get("S3_ACCESS_KEY_ID")
+S3_SECRET_ACCESS_KEY = os.environ.get("S3_SECRET_ACCESS_KEY")
+
+HOME_FIRM = os.environ.get("HOME_FIRM")

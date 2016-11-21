@@ -1,5 +1,6 @@
 from datetime import datetime
 from . import db
+from config import HOME_FIRM
 
 docAttributes = db.Table('docAttributes',
 	db.Column('document_id', db.Integer, db.ForeignKey('documents.id')),
