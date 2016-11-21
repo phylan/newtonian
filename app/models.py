@@ -13,10 +13,14 @@ userMessages = db.Table('userMessages',
 	db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
 	db.Column('message_id', db.Integer, db.ForeignKey('messages.id')))
 
-userMatters - db.Table('userMatters',
+userMatters = db.Table('userMatters',
 	db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
 	db.Column('matter_id', db.Integer, db.ForeignKey('matters.id')))
 
+foundDocs = db.Table('foundDocs',
+	db.Column('document_id', db.Integer, db.ForeignKey('documents.id')),
+	db.Column('query_id', db.Integer, db.ForeignKey('queries.id')))
+	
 class Document(db.Model):
 	__tablename__ = 'documents'
 	id = db.Column(db.Integer, primary_key=True)
@@ -25,6 +29,7 @@ class Document(db.Model):
 	matter_id = db.Column(db.Integer, db.ForeignKey('matters.id'))
 	messages = db.relationship('Message', backref='document', lazy='dynamic')
 	metadata = db.relationship('Metadatum', backref='document', lazy='dynamic')
+	queries = db.relationship('Query', secondary = foundDocs, backref=db.backref('documents', lazy='dynamic'), lazy='dynamic')
 	
 class Field(db.Model):
 	__tablename__ = 'fields'
@@ -43,6 +48,7 @@ class User(db.Model):
 	firm = db.Column(db.String(128), default=HOME_FIRM)
 	email = db.Column(db.String(64))
 	permission = db.Column(db.Integer)
+	queries = db.relationship('Query', backref='creator', lazy='dynamic')
 	inMessages = db.relationship('Message', secondary = userMessages, backref=db.backref('users', lazy='dynamic'), lazy='dynamic')
 	sentMessages = db.relationship('Message', backref='author', lazy='dynamic')
 	matters = db.relationship('Matter', secondary = userMatters, backref=db.backref('users', lazy='dynamic'), lazy='dynamic')
@@ -53,51 +59,52 @@ class Tag(db.Model):
 	name = db.Column(db.String(128))
 	description = db.Column(db.String(256))
 	matter_id = db.Column(db.Integer, db.ForeignKey('matters.id'))
-	documents
-	isParent
+	documents = db.relationship('Document', secondary = docTagging, backref=db.backref('tags', lazy='dynamic'), lazy='dynamic')
+	isParent = db.Column(db.Boolean)
 	
 class Message(db.Model):
 	__tablename__ = 'messages'
-	id
-	matter
+	id = db.Column(db.Integer, primary_key=True)
+	matter_id = db.Column(db.Integer, db.ForeignKey('matters.id'))
 	author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	recipients = db.relationship('User', secondary = userMessages, backref=db.backref('recipients', lazy='dynamic'), lazy='dynamic')
 	document_id = db.Column(db.Integer, db.ForeignKey('documents.id'))
-	content
-	timestamp
+	content = db.Column(db.String(256))
+	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 	
 class Query(db.Model):
 	__tablename__ = 'queries'
-	id
-	name
-	matter
-	documents
-	author 
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(128))
+	matter_id = db.Column(db.Integer, db.ForeignKey('matters.id'))
+	documents = db.relationship('Document', secondary = foundDocs, backref=db.backref('documents', lazy='dynamic'), lazy='dynamic')
+	creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	isPrivate = db.Column(db.Boolean)
 	
 class Client(db.Model):
 	__tablename__ = 'clients'
-	id
-	number
-	name
-	matters
+	id = db.Column(db.Integer, primary_key=True)
+	number = db.Column(db.Integer)
+	name = db.Column(db.String(128))
+	matters = db.relationship('Matter', backref='client', lazy='dynamic')
 
 class Matter(db.Model):
 	__tablename__ = 'matters'
-	id
-	active
-	number
-	name
-	client
+	id = db.Column(db.Integer, primary_key=True)
+	active = db.Column(db.Boolean)
+	number = db.Column(db.Integer)
+	name = db.Column(db.String(128))
+	client_id = db.Column(db.Integer, db.ForeignKey('clients.id'))
 	documents = db.relationship('Document', backref='matter', lazy='dynamic')
 	users = db.relationship('User', seconary = userMatters, backref=db.backref('matters', lazy='dynamic'), lazy='dynamic')
-	queries
-	messages
+	queries = db.relationship('Query', backref='matter', lazy=)
+	messages = db.relationship('Message', backref='matter', lazy='dynamic')
 	tags = db.relationship('Tag', backref='matter', lazy='dynamic')
 
 class Metadatum(db.Model):
 	__tablename__ = 'metadata'
-	id
-	value
+	id = db.Column(db.Integer, primary_key=True)
+	value = db.Column(db.Text)
 	field_id = db.Column(db.Integer, db.ForeignKey('fields.id'))
 	document_id = db.Column(db.Integer, db.ForeignKey('documents.id'))
 	
